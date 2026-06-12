@@ -197,7 +197,6 @@ Func OKButton()
         LaunchClientInstance($host, $path, $user, $pass, $avatar)
     EndIf
 EndFunc
-
 Func LaunchClientInstance($sHost, $sPath, $sUser, $sPass, $sAvatar)
     Local $execTarget = $sPath & $sHost & ".exe"
     If Not FileExists($execTarget) Then
@@ -207,6 +206,13 @@ Func LaunchClientInstance($sHost, $sPath, $sUser, $sPass, $sAvatar)
             Return
         EndIf
     EndIf
+
+    ; --- CONFIG INJECTION MATRIX ---
+    Local $cfgFile = $sPath & "login_" & $sUser & ".cfg"
+    If Not FileExists($cfgFile) Then
+        FileWrite($cfgFile, "[ClientGame]" & @CRLF)
+    EndIf
+    IniWrite($cfgFile, "ClientGame", "launcherAvatarName", $sAvatar)
 
     Local $cmdArgs = " -- -s LoginServer loginServerAddress=yourserver.com loginServerPort=44453"
 
@@ -239,33 +245,30 @@ Func LaunchClientInstance($sHost, $sPath, $sUser, $sPass, $sAvatar)
         ; Wait for graphics layer initialization before clicking
         Sleep(500)
 
-
-
         ; --- AUTOMATED LOGIN KEYSTROKE SEQUENCE ---
-		MouseClick("left", 500, 500)
-		Sleep(300)
-		MouseClick("left", 520, 500)
-		Sleep(300)
-		MouseClick("left", 500, 500)
-		Sleep(300)
-		MouseClick("left", 570, 500)
-		Sleep(300)
-		MouseClick("left", 570, 500)
-		Sleep(300)
-		MouseClick("left", 570, 500)
-		Sleep(2000)
+        MouseClick("left", 500, 500)
+        Sleep(100)
+        MouseClick("left", 520, 500)
+        Sleep(100)
+        MouseClick("left", 500, 500)
+        Sleep(100)
+        MouseClick("left", 570, 500)
+        Sleep(100)
+        MouseClick("left", 570, 500)
+        Sleep(100)
+        MouseClick("left", 570, 500)
+        Sleep(2000)
 
-        ;ControlSend($hWindow, "", "", "{TAB}") ; Press TAB first to focus the user field
+        ; Automation keystrokes sequence
         Send("{TAB}")
-		Sleep(300)
-        ;ControlSend($hWindow, "", "", $sUser, 1) ; Type username safely (raw mode)
-        ;Sleep(200)
-        ;ControlSend($hWindow, "", "", "{TAB}") ; Advance to password field
-        Sleep(1000)
-        ControlSend($hWindow, "", "", $sPass, 1) ; Type password safely (raw mode)
-        Sleep(200)
-		Send("{ENTER}")
-        ;ControlSend($hWindow, "", "", "{ENTER}") ; Submit login credentials
+        ;Sleep(600)
+        ;ControlSend($hWindow, "", "", $sUser, 1)
+        ;Sleep(600)
+        ;ControlSend($hWindow, "", "", "{TAB}")
+        Sleep(600)
+        ControlSend($hWindow, "", "", $sPass, 1)
+        Sleep(600)
+        Send("{ENTER}")
     EndIf
 EndFunc
 Func LoadPathSpecificSettings()
@@ -275,7 +278,7 @@ Func LoadPathSpecificSettings()
     ; Dynamically parse configuration elements linked strictly to the chosen path
     Local $targetHost = IniRead($iniFile, $selectedPath, "TargetHost", "SwgClient")
     Local $user = IniRead($iniFile, $selectedPath, "Username", "nickwill")
-    Local $pass = IniRead($iniFile, $selectedPath, "Password", "")
+    ;Local $pass = IniRead($iniFile, $selectedPath, "Password", "")
     Local $avatar = IniRead($iniFile, $selectedPath, "Avatar", "NickWill")
 
     GUICtrlSetData($Input1, $savedHostsList, $targetHost)
@@ -335,6 +338,7 @@ Func AddAllAvatarsToQueue()
         GUICtrlSetData($ListTerminalQueue, $splitAvatars[$i] & " [" & $host & "]")
     Next
 EndFunc
+
 Func RemoveSelectedFromQueue()
     Local $index = _GUICtrlListBox_GetCurSel($ListTerminalQueue)
     If $index = -1 Then Return
@@ -397,6 +401,7 @@ Func UpdateHistoricalLists($sHost, $sPath, $sAvatar)
         $savedHostsList &= "|" & $sHost
         IniWrite($iniFile, "History", "HostsList", $savedHostsList)
     EndIf
+
     If Not StringInStr($savedPathsList, $sPath) Then
         $savedPathsList &= "|" & $sPath
         IniWrite($iniFile, "History", "PathsList", $savedPathsList)
@@ -411,15 +416,12 @@ Func UpdateHistoricalLists($sHost, $sPath, $sAvatar)
 EndFunc
 
 Func DeleteHost()
-    ; Add host deletion logic here if needed
 EndFunc
 
 Func DeletePath()
-    ; Add path deletion logic here if needed
 EndFunc
 
 Func DeleteAvatar()
-    ; Add avatar deletion logic here if needed
 EndFunc
 
 Func CLOSEClicked()
