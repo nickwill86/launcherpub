@@ -217,9 +217,7 @@ EndFunc
 
 Func LaunchClientInstance($sHost, $sPath, $sUser, $sPass, $sAvatar)
     Local $execTarget = $sPath & $sHost & ".exe"
-
     If Not FileExists($execTarget) Then
-        ; Fallback check for default production build name
         $execTarget = $sPath & "SwgClient_r.exe"
         If Not FileExists($execTarget) Then
             MsgBox(16, "Hardware Error", "Executable target mainframe absent at: " & $sPath)
@@ -227,13 +225,10 @@ Func LaunchClientInstance($sHost, $sPath, $sUser, $sPass, $sAvatar)
         EndIf
     EndIf
 
-    ; Parameter construction string passing explicitly to client login interface parameters
-    Local $cmdArgs = " -- -s LoginServer loginServerAddress=yourserver.com loginServerPort=44453" ; Customize your login server variables here
+    ; --- FIX: ADD THIS EXPLICIT ARGUMENTS DECLARATION LINE HERE ---
+    Local $cmdArgs = " -- -s LoginServer loginServerAddress=yourserver.com loginServerPort=44453"
 
-    ; Setup specific tracking configurations inside the operational target directory
-    FileChangeDir($sPath)
-
-    ; Run the game and capture its explicit System Process ID (PID)
+    ; Run the game and capture its system process identity
     Local $pID = Run('"' & $execTarget & '"' & $cmdArgs, $sPath, @SW_SHOW)
     If @error Then
         MsgBox(16, "Execution Failure", "Failed processing target context ID: " & $execTarget)
@@ -241,25 +236,60 @@ Func LaunchClientInstance($sHost, $sPath, $sUser, $sPass, $sAvatar)
     EndIf
 
     ; --- DYNAMIC WINDOW TITLE TRACKING MATRIX ---
-    ; Wait briefly for the game engine to instantiate its display window frame
     Local $hWindow = 0
-    For $wait = 1 To 20 ; Loops for up to 10 seconds total (20 * 500ms)
+    For $wait = 1 To 20
         Sleep(500)
         Local $aWinList = WinList()
         For $i = 1 To $aWinList[0][0]
-            ; Verify the window belongs to our newly launched game process and is visible
             If WinGetProcess($aWinList[$i][1]) = $pID And $aWinList[$i][0] <> "" Then
-                $hWindow = $aWinList[$i][1] ; Capture the explicit Window Handle
+                $hWindow = $aWinList[$i][1]
                 ExitLoop 2
             EndIf
         Next
     Next
+EndIf
 
-    ; If found, instantly override the title bar to display the character avatar profile
+; Get the position and size of the target window
+	Local $aPos = WinGetPos($hWindow)
+
+	If Not @error Then
+		; Calculate the center relative to the window itself
+		Local $centerX = $aPos[2] / 2
+		Local $centerY = $aPos[3] / 2
+
+		; Send a left click to the center of the window
+		;ControlClick($hWindow, "", "", "left", 1, $centerX, $centerY)
+        ; Send login data once window frame initializes
+
     If $hWindow <> 0 Then
         WinSetTitle($hWindow, "", $sAvatar & " By:NickWill")
+
+        WinActivate($hWindow)
+        WinWaitActive($hWindow, "", 5)
+        Sleep(1000)
+		Sleep(8000)
+        ControlClick($hWindow, "", "", "left", 1, $centerX, $centerY)
+		Sleep(1000)
+        ControlClick($hWindow, "", "", "left", 1, $centerX, $centerY)
+		Sleep(1000)
+        ControlClick($hWindow, "", "", "left", 1, $centerX, $centerY)
+		Sleep(1000)
+        ControlClick($hWindow, "", "", "left", 1, $centerX, $centerY)
+
+        ; --- UPDATED INITIAL KEYSTROKE SEQUENCE ---
+        ControlSend($hWindow, "", "", "{TAB}") ; Press TAB first to focus the field
+        Sleep(300) ; Brief delay to allow focus shift
+
+        ControlSend($hWindow, "", "", $sUser, 1) ; Type username
+        Sleep(200)
+        ControlSend($hWindow, "", "", "{TAB}") ; Advance to password field
+        Sleep(200)
+        ControlSend($hWindow, "", "", $sPass, 1) ; Type password
+        Sleep(200)
+        ControlSend($hWindow, "", "", "{ENTER}") ; Submit login
     EndIf
 EndFunc
+
 
 
 Func LoadPathSpecificSettings()
