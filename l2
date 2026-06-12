@@ -1,5 +1,4 @@
 #pragma compile(RequiredAdmin, true) ; Forces administrative privileges for file copying
-
 #include <GUIConstantsEx.au3>
 #include <ComboConstants.au3>
 #include <EditConstants.au3>
@@ -11,25 +10,24 @@
 Opt("GUIOnEventMode", 1)
 
 ; DESIGN MATRIX: Deep Tech Canvas Profile
-Global $COLOR_BG       = 0x0A0F1D ; Void Cyber Black
-Global $COLOR_ACCENT   = 0x00FFCC ; Neon Tech Cyan
-Global $COLOR_TEXT     = 0x8A9FB4 ; Matrix Slate Gray
-Global $COLOR_PANEL    = 0x141E30 ; Structural Tech Dark Blue
+Global $COLOR_BG = 0x0A0F1D ; Void Cyber Black
+Global $COLOR_ACCENT = 0x00FFCC ; Neon Tech Cyan
+Global $COLOR_TEXT = 0x8A9FB4 ; Matrix Slate Gray
+Global $COLOR_PANEL = 0x141E30 ; Structural Tech Dark Blue
 
 Global $iniFile = @ScriptDir & "\launcher_config.ini"
 
 ; --- MULTI-LAUNCH CORE TRACKING MEMORY ARRAYS ---
-Global $aQueue_Hosts[1]   = [""]
-Global $aQueue_Paths[1]   = [""]
-Global $aQueue_Users[1]   = [""]
-Global $aQueue_Passs[1]   = [""]
+Global $aQueue_Hosts[1] = [""]
+Global $aQueue_Paths[1] = [""]
+Global $aQueue_Users[1] = [""]
+Global $aQueue_Passs[1] = [""]
 Global $aQueue_Avatars[1] = [""]
 Global $iQueueCount = 0
 
 ; --- CONFIG LOADING & HISTORIC MERGING SYSTEM ---
 Global $defaultHosts = "SwgClient|Star Wars Galaxies"
 Global $savedHostsList = IniRead($iniFile, "History", "HostsList", $defaultHosts)
-
 Global $defaultPaths = "C:\BENSWGEMU\|C:\nge\|C:\swgemu\|D:\nge\|D:\swgemu\"
 Global $savedPathsList = IniRead($iniFile, "History", "PathsList", $defaultPaths)
 
@@ -37,16 +35,15 @@ Global $savedPathsList = IniRead($iniFile, "History", "PathsList", $defaultPaths
 Global $currentPath = IniRead($iniFile, "Global", "LastActivePath", "C:\BENSWGEMU\")
 
 ; Load path-specific user settings using the active path as the section header
-Global $currentHost   = IniRead($iniFile, $currentPath, "TargetHost", "SwgClient")
+Global $currentHost = IniRead($iniFile, $currentPath, "TargetHost", "SwgClient")
 Global $savedUsername = IniRead($iniFile, $currentPath, "Username", "nickwill")
 Global $savedPassword = IniRead($iniFile, $currentPath, "Password", "")
-Global $savedAvatar   = IniRead($iniFile, $currentPath, "Avatar", "NickWill")
+Global $savedAvatar = IniRead($iniFile, $currentPath, "Avatar", "NickWill")
 
 ; Load path-specific list of avatars/characters so you don't leak characters between servers
 Global $defaultAvatars = "NickWill|Leeroy|Cube"
 Global $savedAvatarsList = IniRead($iniFile, "History_" & StringRegExpReplace($currentPath, "[\\/:]", "_"), "AvatarsList", $defaultAvatars)
-
-; Window size set to 460 height to cleanly accommodate new multi-launch control buttons
+; Window size set to 460 height to cleanly accommodate multi-launch control buttons
 Global $mainwindow = GUICreate("= NickWill's SWG Launcher =", 580, 460, -1, -1)
 GUISetBkColor($COLOR_BG)
 GUISetIcon("C:\Program Files (x86)\StarWarGalaxies\SwgClient_r.exe", 0)
@@ -56,12 +53,10 @@ GUISetOnEvent($GUI_EVENT_CLOSE, "CLOSEClicked")
 GUICtrlCreateLabel("[ TARGET HOST ID ]", 15, 20, 320, 20)
 GUICtrlSetColor(-1, $COLOR_ACCENT)
 GUICtrlSetFont(-1, 9, 800, 0, "Consolas")
-
 Global $Input1 = GUICtrlCreateCombo($currentHost, 340, 16, 185)
 GUICtrlSetData($Input1, $savedHostsList, $currentHost)
 GUICtrlSetBkColor($Input1, $COLOR_PANEL)
 GUICtrlSetColor($Input1, $COLOR_ACCENT)
-
 Global $delBtn1 = GUICtrlCreateButton("x", 535, 15, 30, 23)
 GUICtrlSetBkColor($delBtn1, $COLOR_PANEL)
 GUICtrlSetColor($delBtn1, 0xFF3333)
@@ -72,23 +67,21 @@ GUICtrlSetOnEvent($delBtn1, "DeleteHost")
 GUICtrlCreateLabel("[ SWG PATH ]", 15, 65, 260, 20)
 GUICtrlSetColor(-1, $COLOR_TEXT)
 GUICtrlSetFont(-1, 9, 400, 0, "Consolas")
-
 Global $Input3 = GUICtrlCreateCombo($currentPath, 280, 61, 245)
 GUICtrlSetData($Input3, $savedPathsList, $currentPath)
 GUICtrlSetBkColor($Input3, $COLOR_PANEL)
 GUICtrlSetColor($Input3, $COLOR_ACCENT)
 GUICtrlSetOnEvent($Input3, "LoadPathSpecificSettings")
-
 Global $delBtn3 = GUICtrlCreateButton("x", 535, 60, 30, 23)
 GUICtrlSetBkColor($delBtn3, $COLOR_PANEL)
 GUICtrlSetColor($delBtn3, 0xFF3333)
 GUICtrlSetFont($delBtn3, 9, 800, 0, "Consolas")
 GUICtrlSetOnEvent($delBtn3, "DeletePath")
+
 ; --- ROW 3: USERNAME IDENTIFICATION ---
 GUICtrlCreateLabel("[ USERNAME IDENTIFICATION ]", 15, 110, 270, 20)
 GUICtrlSetColor(-1, $COLOR_TEXT)
 GUICtrlSetFont(-1, 9, 400, 0, "Consolas")
-
 Global $Input4 = GUICtrlCreateInput($savedUsername, 300, 106, 265, 20)
 GUICtrlSetBkColor($Input4, $COLOR_PANEL)
 GUICtrlSetColor($Input4, $COLOR_ACCENT)
@@ -98,11 +91,9 @@ GUICtrlSetFont($Input4, 10, 400, 0, "Consolas")
 GUICtrlCreateLabel("[ SECURITY PASSWORD ]", 15, 155, 270, 20)
 GUICtrlSetColor(-1, $COLOR_TEXT)
 GUICtrlSetFont(-1, 9, 400, 0, "Consolas")
-
 Global $Input5 = GUICtrlCreateInput($savedPassword, 300, 151, 195, 20, $ES_PASSWORD)
 GUICtrlSetBkColor($Input5, $COLOR_PANEL)
 GUICtrlSetColor($Input5, $COLOR_ACCENT)
-
 Global $CheckboxShowPass = GUICtrlCreateCheckbox("SHOW", 505, 151, 60, 20)
 GUICtrlSetColor($CheckboxShowPass, $COLOR_ACCENT)
 GUICtrlSetFont($CheckboxShowPass, 8, 800, 0, "Consolas")
@@ -112,12 +103,10 @@ GUICtrlSetOnEvent($CheckboxShowPass, "TogglePasswordVisibility")
 GUICtrlCreateLabel("[ AVATAR SELECTION ]", 15, 200, 320, 20)
 GUICtrlSetColor(-1, $COLOR_TEXT)
 GUICtrlSetFont(-1, 9, 400, 0, "Consolas")
-
 Global $Input2 = GUICtrlCreateCombo($savedAvatar, 340, 196, 185)
 GUICtrlSetData($Input2, $savedAvatarsList, $savedAvatar)
 GUICtrlSetBkColor($Input2, $COLOR_PANEL)
 GUICtrlSetColor($Input2, $COLOR_ACCENT)
-
 Global $delBtn2 = GUICtrlCreateButton("x", 535, 195, 30, 23)
 GUICtrlSetBkColor($delBtn2, $COLOR_PANEL)
 GUICtrlSetColor($delBtn2, 0xFF3333)
@@ -128,7 +117,6 @@ GUICtrlSetOnEvent($delBtn2, "DeleteAvatar")
 GUICtrlCreateLabel("[ MULTI-LAUNCH TERMINAL QUEUE ]", 15, 240, 250, 15)
 GUICtrlSetColor(-1, $COLOR_TEXT)
 GUICtrlSetFont(-1, 8, 400, 0, "Consolas")
-
 Global $ListTerminalQueue = GUICtrlCreateList("", 15, 258, 240, 115, BitOR($LBS_NOTIFY, $WS_VSCROLL, $WS_BORDER))
 GUICtrlSetBkColor($ListTerminalQueue, $COLOR_PANEL)
 GUICtrlSetColor($ListTerminalQueue, $COLOR_ACCENT)
@@ -176,9 +164,6 @@ GUISetState(@SW_SHOW)
 While 1
     Sleep(1000)
 WEnd
-; ==============================================================================
-; CORE ENGINE EXECUTION FUNCTIONS
-; ==============================================================================
 Func OKButton()
     ; Gather immediate interface parameters
     Local $host = GUICtrlRead($Input1)
@@ -196,7 +181,6 @@ Func OKButton()
     IniWrite($iniFile, $path, "Username", $user)
     IniWrite($iniFile, $path, "Password", $pass)
     IniWrite($iniFile, $path, "Avatar", $avatar)
-
     UpdateHistoricalLists($host, $path, $avatar)
 
     ; Check whether we run standard single profiling or the Multi-Launch Engine Queue
@@ -205,7 +189,6 @@ Func OKButton()
             MsgBox(48, "Terminal Alert", "The Multi-Launch script queue is empty! Add profiles first.")
             Return
         EndIf
-
         For $i = 0 To $iQueueCount - 1
             LaunchClientInstance($aQueue_Hosts[$i], $aQueue_Paths[$i], $aQueue_Users[$i], $aQueue_Passs[$i], $aQueue_Avatars[$i])
             Sleep(1500) ; Hardware buffer delay between instances
@@ -225,7 +208,6 @@ Func LaunchClientInstance($sHost, $sPath, $sUser, $sPass, $sAvatar)
         EndIf
     EndIf
 
-    ; --- FIX: ADD THIS EXPLICIT ARGUMENTS DECLARATION LINE HERE ---
     Local $cmdArgs = " -- -s LoginServer loginServerAddress=yourserver.com loginServerPort=44453"
 
     ; Run the game and capture its system process identity
@@ -247,60 +229,54 @@ Func LaunchClientInstance($sHost, $sPath, $sUser, $sPass, $sAvatar)
             EndIf
         Next
     Next
-EndIf
 
-; Get the position and size of the target window
-	Local $aPos = WinGetPos($hWindow)
-
-	If Not @error Then
-		; Calculate the center relative to the window itself
-		Local $centerX = $aPos[2] / 2
-		Local $centerY = $aPos[3] / 2
-
-		; Send a left click to the center of the window
-		;ControlClick($hWindow, "", "", "left", 1, $centerX, $centerY)
-        ; Send login data once window frame initializes
-
+    ; Send login data once window frame initializes
     If $hWindow <> 0 Then
         WinSetTitle($hWindow, "", $sAvatar & " By:NickWill")
-
         WinActivate($hWindow)
         WinWaitActive($hWindow, "", 5)
+
+        ; Wait for graphics layer initialization before clicking
+        Sleep(500)
+
+
+
+        ; --- AUTOMATED LOGIN KEYSTROKE SEQUENCE ---
+		MouseClick("left", 500, 500)
+		Sleep(300)
+		MouseClick("left", 520, 500)
+		Sleep(300)
+		MouseClick("left", 500, 500)
+		Sleep(300)
+		MouseClick("left", 570, 500)
+		Sleep(300)
+		MouseClick("left", 570, 500)
+		Sleep(300)
+		MouseClick("left", 570, 500)
+		Sleep(2000)
+
+        ;ControlSend($hWindow, "", "", "{TAB}") ; Press TAB first to focus the user field
+        Send("{TAB}")
+		Sleep(300)
+        ;ControlSend($hWindow, "", "", $sUser, 1) ; Type username safely (raw mode)
+        ;Sleep(200)
+        ;ControlSend($hWindow, "", "", "{TAB}") ; Advance to password field
         Sleep(1000)
-		Sleep(8000)
-        ControlClick($hWindow, "", "", "left", 1, $centerX, $centerY)
-		Sleep(1000)
-        ControlClick($hWindow, "", "", "left", 1, $centerX, $centerY)
-		Sleep(1000)
-        ControlClick($hWindow, "", "", "left", 1, $centerX, $centerY)
-		Sleep(1000)
-        ControlClick($hWindow, "", "", "left", 1, $centerX, $centerY)
-
-        ; --- UPDATED INITIAL KEYSTROKE SEQUENCE ---
-        ControlSend($hWindow, "", "", "{TAB}") ; Press TAB first to focus the field
-        Sleep(300) ; Brief delay to allow focus shift
-
-        ControlSend($hWindow, "", "", $sUser, 1) ; Type username
+        ControlSend($hWindow, "", "", $sPass, 1) ; Type password safely (raw mode)
         Sleep(200)
-        ControlSend($hWindow, "", "", "{TAB}") ; Advance to password field
-        Sleep(200)
-        ControlSend($hWindow, "", "", $sPass, 1) ; Type password
-        Sleep(200)
-        ControlSend($hWindow, "", "", "{ENTER}") ; Submit login
+		Send("{ENTER}")
+        ;ControlSend($hWindow, "", "", "{ENTER}") ; Submit login credentials
     EndIf
 EndFunc
-
-
-
 Func LoadPathSpecificSettings()
     Local $selectedPath = GUICtrlRead($Input3)
     If StringRight($selectedPath, 1) <> "\" Then $selectedPath &= "\"
 
     ; Dynamically parse configuration elements linked strictly to the chosen path
     Local $targetHost = IniRead($iniFile, $selectedPath, "TargetHost", "SwgClient")
-    Local $user       = IniRead($iniFile, $selectedPath, "Username", "nickwill")
-    Local $pass       = IniRead($iniFile, $selectedPath, "Password", "")
-    Local $avatar     = IniRead($iniFile, $selectedPath, "Avatar", "NickWill")
+    Local $user = IniRead($iniFile, $selectedPath, "Username", "nickwill")
+    Local $pass = IniRead($iniFile, $selectedPath, "Password", "")
+    Local $avatar = IniRead($iniFile, $selectedPath, "Avatar", "NickWill")
 
     GUICtrlSetData($Input1, $savedHostsList, $targetHost)
     GUICtrlSetData($Input4, $user)
@@ -308,13 +284,10 @@ Func LoadPathSpecificSettings()
 
     Local $pathSection = "History_" & StringRegExpReplace($selectedPath, "[\\/:]", "_")
     Local $localAvatars = IniRead($iniFile, $pathSection, "AvatarsList", $defaultAvatars)
-
     GUICtrlSetData($Input2, "") ; Reset active combo block
     GUICtrlSetData($Input2, $localAvatars, $avatar)
 EndFunc
-; ==============================================================================
-; MULTI-LAUNCH TERMINAL QUEUE INFRASTRUCTURE
-; ==============================================================================
+
 Func AddActiveProfileToQueue()
     Local $host = GUICtrlRead($Input1)
     Local $path = GUICtrlRead($Input3)
@@ -328,10 +301,10 @@ Func AddActiveProfileToQueue()
         ReDim $aQueue_Hosts[$iQueueCount + 1], $aQueue_Paths[$iQueueCount + 1], $aQueue_Users[$iQueueCount + 1], $aQueue_Passs[$iQueueCount + 1], $aQueue_Avatars[$iQueueCount + 1]
     EndIf
 
-    $aQueue_Hosts[$iQueueCount]   = $host
-    $aQueue_Paths[$iQueueCount]   = $path
-    $aQueue_Users[$iQueueCount]   = $user
-    $aQueue_Passs[$iQueueCount]   = $pass
+    $aQueue_Hosts[$iQueueCount] = $host
+    $aQueue_Paths[$iQueueCount] = $path
+    $aQueue_Users[$iQueueCount] = $user
+    $aQueue_Passs[$iQueueCount] = $pass
     $aQueue_Avatars[$iQueueCount] = $avatar
     $iQueueCount += 1
 
@@ -350,20 +323,18 @@ Func AddAllAvatarsToQueue()
 
     For $i = 1 To $splitAvatars[0]
         If $splitAvatars[$i] == "" Then ContinueLoop
-
         ReDim $aQueue_Hosts[$iQueueCount + 1], $aQueue_Paths[$iQueueCount + 1], $aQueue_Users[$iQueueCount + 1], $aQueue_Passs[$iQueueCount + 1], $aQueue_Avatars[$iQueueCount + 1]
 
-        $aQueue_Hosts[$iQueueCount]   = $host
-        $aQueue_Paths[$iQueueCount]   = $path
-        $aQueue_Users[$iQueueCount]   = $user
-        $aQueue_Passs[$iQueueCount]   = $pass
+        $aQueue_Hosts[$iQueueCount] = $host
+        $aQueue_Paths[$iQueueCount] = $path
+        $aQueue_Users[$iQueueCount] = $user
+        $aQueue_Passs[$iQueueCount] = $pass
         $aQueue_Avatars[$iQueueCount] = $splitAvatars[$i]
         $iQueueCount += 1
 
         GUICtrlSetData($ListTerminalQueue, $splitAvatars[$i] & " [" & $host & "]")
     Next
 EndFunc
-
 Func RemoveSelectedFromQueue()
     Local $index = _GUICtrlListBox_GetCurSel($ListTerminalQueue)
     If $index = -1 Then Return
@@ -372,10 +343,10 @@ Func RemoveSelectedFromQueue()
 
     ; Shift array elements over deleted position to avoid runtime corruption
     For $i = $index To $iQueueCount - 2
-        $aQueue_Hosts[$i]   = $aQueue_Hosts[$i + 1]
-        $aQueue_Paths[$i]   = $aQueue_Paths[$i + 1]
-        $aQueue_Users[$i]   = $aQueue_Users[$i + 1]
-        $aQueue_Passs[$i]   = $aQueue_Passs[$i + 1]
+        $aQueue_Hosts[$i] = $aQueue_Hosts[$i + 1]
+        $aQueue_Paths[$i] = $aQueue_Paths[$i + 1]
+        $aQueue_Users[$i] = $aQueue_Users[$i + 1]
+        $aQueue_Passs[$i] = $aQueue_Passs[$i + 1]
         $aQueue_Avatars[$i] = $aQueue_Avatars[$i + 1]
     Next
 
@@ -387,10 +358,10 @@ EndFunc
 
 Func ClearMultiLaunchQueue()
     _GUICtrlListBox_ResetContent($ListTerminalQueue)
-    Dim $aQueue_Hosts[1]   = [""]
-    Dim $aQueue_Paths[1]   = [""]
-    Dim $aQueue_Users[1]   = [""]
-    Dim $aQueue_Passs[1]   = [""]
+    Dim $aQueue_Hosts[1] = [""]
+    Dim $aQueue_Paths[1] = [""]
+    Dim $aQueue_Users[1] = [""]
+    Dim $aQueue_Passs[1] = [""]
     Dim $aQueue_Avatars[1] = [""]
     $iQueueCount = 0
 EndFunc
@@ -415,13 +386,13 @@ Func TogglePasswordVisibility()
     Else
         $Input5 = GUICtrlCreateInput($passText, 300, 151, 195, 20, $ES_PASSWORD)
     EndIf
+
     GUICtrlSetBkColor($Input5, $COLOR_PANEL)
     GUICtrlSetColor($Input5, $COLOR_ACCENT)
     GUICtrlSetFont($Input5, 10, 400, 0, "Consolas")
 EndFunc
 
 Func UpdateHistoricalLists($sHost, $sPath, $sAvatar)
-    ; Dynamic historical updating matrix
     If Not StringInStr($savedHostsList, $sHost) Then
         $savedHostsList &= "|" & $sHost
         IniWrite($iniFile, "History", "HostsList", $savedHostsList)
@@ -430,6 +401,7 @@ Func UpdateHistoricalLists($sHost, $sPath, $sAvatar)
         $savedPathsList &= "|" & $sPath
         IniWrite($iniFile, "History", "PathsList", $savedPathsList)
     EndIf
+
     Local $pathSection = "History_" & StringRegExpReplace($sPath, "[\\/:]", "_")
     Local $localAvatars = IniRead($iniFile, $pathSection, "AvatarsList", $defaultAvatars)
     If Not StringInStr($localAvatars, $sAvatar) Then
